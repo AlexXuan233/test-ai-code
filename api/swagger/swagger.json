@@ -1,0 +1,455 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Real-time transaction risk scoring service for LuxeCart.",
+        "title": "LuxeCart Fraud Scorer API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/feedback": {
+            "post": {
+                "description": "Mark a transaction as confirmed fraud or legitimate.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "feedback"
+                ],
+                "summary": "Submit feedback",
+                "parameters": [
+                    {
+                        "description": "Feedback payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.FeedbackRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.FeedbackResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/score": {
+            "post": {
+                "description": "Real-time fraud risk scoring for a transaction during authorization.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoring"
+                ],
+                "summary": "Score a transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction to score",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ScoreRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RiskScoreResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/transactions": {
+            "get": {
+                "description": "Retrieve recent transaction records.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "List transactions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Transaction"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Store a transaction record for historical pattern analysis.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Ingest a historical transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction to ingest",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ScoreRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.IngestResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Check if the service is running.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.HealthResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "invalid request: Field 'amount' is required"
+                }
+            }
+        },
+        "models.FeedbackRequest": {
+            "type": "object",
+            "required": [
+                "confirmed_status",
+                "transaction_id"
+            ],
+            "properties": {
+                "confirmed_status": {
+                    "type": "string",
+                    "enum": [
+                        "fraud",
+                        "legitimate"
+                    ],
+                    "example": "fraud"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "TX-DEMO-001"
+                }
+            }
+        },
+        "models.FeedbackResponse": {
+            "type": "object",
+            "properties": {
+                "confirmed_status": {
+                    "type": "string",
+                    "example": "fraud"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "updated"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "TX-DEMO-001"
+                }
+            }
+        },
+        "models.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "ok"
+                }
+            }
+        },
+        "models.IngestResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "ingested"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "TX-DEMO-001"
+                }
+            }
+        },
+        "models.RiskScoreResponse": {
+            "type": "object",
+            "properties": {
+                "flags": {
+                    "description": "detected risk factors",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "high_value_transaction",
+                        "country_mismatch"
+                    ]
+                },
+                "recommendation": {
+                    "description": "approve, review, decline",
+                    "type": "string",
+                    "example": "decline"
+                },
+                "risk_level": {
+                    "description": "LOW, MEDIUM, HIGH, CRITICAL",
+                    "type": "string",
+                    "example": "HIGH"
+                },
+                "score": {
+                    "type": "integer",
+                    "example": 80
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "TX-DEMO-001"
+                }
+            }
+        },
+        "models.ScoreRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "billing_country",
+                "card_number",
+                "currency",
+                "customer_email",
+                "ip_address",
+                "shipping_address",
+                "shipping_country",
+                "transaction_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 12500
+                },
+                "billing_country": {
+                    "type": "string",
+                    "example": "AE"
+                },
+                "card_bin": {
+                    "type": "string",
+                    "example": "424242"
+                },
+                "card_number": {
+                    "type": "string",
+                    "example": "4242424242424242"
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "USD"
+                },
+                "customer_email": {
+                    "type": "string",
+                    "example": "sarah.alrashed@email.ae"
+                },
+                "customer_id": {
+                    "type": "string",
+                    "example": "CUST-001"
+                },
+                "device_id": {
+                    "type": "string",
+                    "example": "DEV-001"
+                },
+                "ip_address": {
+                    "type": "string",
+                    "example": "192.168.1.50"
+                },
+                "is_first_time": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "shipping_address": {
+                    "type": "string",
+                    "example": "12 Palm Jumeirah, Dubai"
+                },
+                "shipping_country": {
+                    "type": "string",
+                    "example": "AE"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2026-05-02T10:00:00Z"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "TX-DEMO-001"
+                }
+            }
+        },
+        "models.Transaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 12500
+                },
+                "billing_country": {
+                    "type": "string",
+                    "example": "AE"
+                },
+                "card_bin": {
+                    "type": "string",
+                    "example": "424242"
+                },
+                "card_hash": {
+                    "type": "string",
+                    "example": "a1b2c3d4e5f67890"
+                },
+                "confirmed_status": {
+                    "description": "\"\", \"fraud\", \"legitimate\"",
+                    "type": "string",
+                    "example": "fraud"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "USD"
+                },
+                "customer_email": {
+                    "type": "string",
+                    "example": "sarah.alrashed@email.ae"
+                },
+                "customer_id": {
+                    "type": "string",
+                    "example": "CUST-001"
+                },
+                "device_id": {
+                    "type": "string",
+                    "example": "DEV-001"
+                },
+                "flags": {
+                    "description": "JSON array stored as string",
+                    "type": "string",
+                    "example": "[\"high_value_transaction\",\"country_mismatch\"]"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "ip_address": {
+                    "type": "string",
+                    "example": "192.168.1.50"
+                },
+                "is_first_time": {
+                    "type": "boolean"
+                },
+                "recommendation": {
+                    "type": "string",
+                    "example": "decline"
+                },
+                "risk_level": {
+                    "type": "string",
+                    "example": "HIGH"
+                },
+                "score": {
+                    "type": "integer",
+                    "example": 80
+                },
+                "shipping_address": {
+                    "type": "string",
+                    "example": "12 Palm Jumeirah, Dubai"
+                },
+                "shipping_country": {
+                    "type": "string",
+                    "example": "AE"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "TX-DEMO-001"
+                }
+            }
+        }
+    }
+}

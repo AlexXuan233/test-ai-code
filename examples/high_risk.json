@@ -1,0 +1,16 @@
+{
+  "transaction_id": "TX-DEMO-HIGH-001",
+  "timestamp": "2026-05-02T10:05:00Z",
+  "card_number": "4532123456789012",
+  "amount": 25000,
+  "currency": "USD",
+  "customer_email": "attacker9@tempmail.com",
+  "shipping_address": "123 Scam St, Dubai",
+  "shipping_country": "AE",
+  "billing_country": "RU",
+  "ip_address": "10.0.0.50",
+  "customer_id": "CUST-ATTACK-NEW",
+  "is_first_time": true,
+  "card_bin": "510599",
+  "device_id": "DEV-ATTACK"
+}

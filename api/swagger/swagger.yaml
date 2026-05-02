@@ -1,0 +1,319 @@
+basePath: /
+definitions:
+  models.ErrorResponse:
+    properties:
+      error:
+        example: 'invalid request: Field ''amount'' is required'
+        type: string
+    type: object
+  models.FeedbackRequest:
+    properties:
+      confirmed_status:
+        enum:
+        - fraud
+        - legitimate
+        example: fraud
+        type: string
+      transaction_id:
+        example: TX-DEMO-001
+        type: string
+    required:
+    - confirmed_status
+    - transaction_id
+    type: object
+  models.FeedbackResponse:
+    properties:
+      confirmed_status:
+        example: fraud
+        type: string
+      status:
+        example: updated
+        type: string
+      transaction_id:
+        example: TX-DEMO-001
+        type: string
+    type: object
+  models.HealthResponse:
+    properties:
+      status:
+        example: ok
+        type: string
+    type: object
+  models.IngestResponse:
+    properties:
+      status:
+        example: ingested
+        type: string
+      transaction_id:
+        example: TX-DEMO-001
+        type: string
+    type: object
+  models.RiskScoreResponse:
+    properties:
+      flags:
+        description: detected risk factors
+        example:
+        - high_value_transaction
+        - country_mismatch
+        items:
+          type: string
+        type: array
+      recommendation:
+        description: approve, review, decline
+        example: decline
+        type: string
+      risk_level:
+        description: LOW, MEDIUM, HIGH, CRITICAL
+        example: HIGH
+        type: string
+      score:
+        example: 80
+        type: integer
+      transaction_id:
+        example: TX-DEMO-001
+        type: string
+    type: object
+  models.ScoreRequest:
+    properties:
+      amount:
+        example: 12500
+        type: number
+      billing_country:
+        example: AE
+        type: string
+      card_bin:
+        example: "424242"
+        type: string
+      card_number:
+        example: "4242424242424242"
+        type: string
+      currency:
+        example: USD
+        type: string
+      customer_email:
+        example: sarah.alrashed@email.ae
+        type: string
+      customer_id:
+        example: CUST-001
+        type: string
+      device_id:
+        example: DEV-001
+        type: string
+      ip_address:
+        example: 192.168.1.50
+        type: string
+      is_first_time:
+        example: false
+        type: boolean
+      shipping_address:
+        example: 12 Palm Jumeirah, Dubai
+        type: string
+      shipping_country:
+        example: AE
+        type: string
+      timestamp:
+        example: "2026-05-02T10:00:00Z"
+        type: string
+      transaction_id:
+        example: TX-DEMO-001
+        type: string
+    required:
+    - amount
+    - billing_country
+    - card_number
+    - currency
+    - customer_email
+    - ip_address
+    - shipping_address
+    - shipping_country
+    - transaction_id
+    type: object
+  models.Transaction:
+    properties:
+      amount:
+        example: 12500
+        type: number
+      billing_country:
+        example: AE
+        type: string
+      card_bin:
+        example: "424242"
+        type: string
+      card_hash:
+        example: a1b2c3d4e5f67890
+        type: string
+      confirmed_status:
+        description: '"", "fraud", "legitimate"'
+        example: fraud
+        type: string
+      created_at:
+        type: string
+      currency:
+        example: USD
+        type: string
+      customer_email:
+        example: sarah.alrashed@email.ae
+        type: string
+      customer_id:
+        example: CUST-001
+        type: string
+      device_id:
+        example: DEV-001
+        type: string
+      flags:
+        description: JSON array stored as string
+        example: '["high_value_transaction","country_mismatch"]'
+        type: string
+      id:
+        example: 1
+        type: integer
+      ip_address:
+        example: 192.168.1.50
+        type: string
+      is_first_time:
+        type: boolean
+      recommendation:
+        example: decline
+        type: string
+      risk_level:
+        example: HIGH
+        type: string
+      score:
+        example: 80
+        type: integer
+      shipping_address:
+        example: 12 Palm Jumeirah, Dubai
+        type: string
+      shipping_country:
+        example: AE
+        type: string
+      timestamp:
+        type: string
+      transaction_id:
+        example: TX-DEMO-001
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Real-time transaction risk scoring service for LuxeCart.
+  title: LuxeCart Fraud Scorer API
+  version: "1.0"
+paths:
+  /api/v1/feedback:
+    post:
+      consumes:
+      - application/json
+      description: Mark a transaction as confirmed fraud or legitimate.
+      parameters:
+      - description: Feedback payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.FeedbackRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.FeedbackResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Submit feedback
+      tags:
+      - feedback
+  /api/v1/score:
+    post:
+      consumes:
+      - application/json
+      description: Real-time fraud risk scoring for a transaction during authorization.
+      parameters:
+      - description: Transaction to score
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ScoreRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RiskScoreResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Score a transaction
+      tags:
+      - scoring
+  /api/v1/transactions:
+    get:
+      description: Retrieve recent transaction records.
+      parameters:
+      - default: 20
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+      summary: List transactions
+      tags:
+      - transactions
+    post:
+      consumes:
+      - application/json
+      description: Store a transaction record for historical pattern analysis.
+      parameters:
+      - description: Transaction to ingest
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ScoreRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.IngestResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Ingest a historical transaction
+      tags:
+      - transactions
+  /health:
+    get:
+      description: Check if the service is running.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+swagger: "2.0"

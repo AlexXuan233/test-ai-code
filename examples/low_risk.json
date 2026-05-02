@@ -1,0 +1,16 @@
+{
+  "transaction_id": "TX-DEMO-LOW-001",
+  "timestamp": "2026-05-02T10:00:00Z",
+  "card_number": "4242424242424242",
+  "amount": 3500,
+  "currency": "AED",
+  "customer_email": "sarah.alrashed@email.ae",
+  "shipping_address": "12 Palm Jumeirah, Dubai",
+  "shipping_country": "AE",
+  "billing_country": "AE",
+  "ip_address": "192.168.1.50",
+  "customer_id": "CUST-LOYAL-1",
+  "is_first_time": false,
+  "card_bin": "424242",
+  "device_id": "DEV-LOYAL-1"
+}

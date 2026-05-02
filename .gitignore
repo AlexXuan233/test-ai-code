@@ -30,3 +30,16 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Binaries
+fraud-scorer-api
+fraud-scorer-seed
+
+# SQLite database
+fraud_scorer.db
+*.db
+
+# Logs
+server.log
+*.log
+
